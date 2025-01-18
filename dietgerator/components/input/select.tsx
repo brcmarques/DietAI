@@ -38,9 +38,9 @@ export function Select({ name, control, placeholder, error, options }: SelectPro
 
             render={({ field: { onChange, onBlur, value }}) => (
                 <>
-                <TouchableOpacity style={styles.select}>
+                <TouchableOpacity style={styles.select} onPress={() => setVisible(true)}>
                     <Text>
-                        Selecione algo...
+                        { value ? options.find(option => option.value === value)?.label : placeholder }
                     </Text>
                     <Feather
                         name='arrow-down' size={16} color="#000"
@@ -48,14 +48,15 @@ export function Select({ name, control, placeholder, error, options }: SelectPro
                 </TouchableOpacity>
 
                 <Modal
-                visible={true}
+                visible={visible}
                 animationType='fade'
                 transparent={true}
-                onRequestClose={() => {}}
+                onRequestClose={() => setVisible(false) }
                 >
                     <TouchableOpacity
                         style={styles.modalContainer}
                         activeOpacity={1}
+                        onPress={() => setVisible(false)}
                     >
                         <TouchableOpacity style={styles.modalContent} activeOpacity={1}>
                             <FlatList
@@ -63,7 +64,14 @@ export function Select({ name, control, placeholder, error, options }: SelectPro
                                 data={options}
                                 keyExtractor={(item) => item.value.toString() }
                                 renderItem={ ({ item }) => (
-                                    <TouchableOpacity style={styles.option}>
+                                    <TouchableOpacity 
+                                    style={styles.option}
+                                    onPress={() => {
+                                        onChange(item.value)
+                                        setVisible(false)
+                                        
+                                    }}
+                                    >
                                         <Text>{item.label}</Text>
                                     </TouchableOpacity>
 
@@ -127,5 +135,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(208,208,208, 0.40)',
         borderRadius: 4,
         paddingHorizontal: 8
-    }
+    },
 })

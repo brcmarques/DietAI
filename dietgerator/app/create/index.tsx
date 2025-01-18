@@ -11,6 +11,8 @@ import { useForm } from 'react-hook-form'
 import { colors } from '../../constants/colors'
 import { Header } from '@/components/header'
 import { Select } from '../../components/input/select'
+import { useDataStore } from '../../store/data'
+import { router } from 'expo-router'
 
 const schema = z.object({
     gender: z.string().min(1, { message: "O genero é obrigatório" }),
@@ -28,11 +30,41 @@ export default function Create() {
     
       })
 
+      const setPageTwo = useDataStore(state => state.setPageTwo)
+
       const genderOptions = [
         { label: "Masculino", value: "masculino" },
         { label: "Feminino", value: "feminino" },
 
       ]
+
+      const levelOptions = [
+        { label: "Sedentario, (pouco ou nenhuma atividade física)", value: "Sedentário" },
+        { label: "Levemente ativo, (exercícios de 1 a 3 vezes na semana)", value: "Levemente ativo, (exercícios de 1 a 3 vezes na semana)" },
+        { label: "Moderadamente ativo, (exercícios de 3 a 5 vezes na semana)", value: "Moderadamente ativo, (exercícios de 3 a 5 vezes na semana)" },
+        { label: "Altamente ativo, (exercícios de 5 a 7 vezes na semana)", value: "Altamente ativo, (exercícios de 5 a 7 vezes na semana)" },
+
+      ]
+
+      const objectiveOptions = [
+        { label: "Emagrecer", value: "Emagrecer" },
+        { label: "Hipertrofia", value: "Hipertrofia" },
+        { label: "Definição", value: "Definição" },
+        { label: "Hipertrofia + Definição", value: "Hipertrofia + Definição" },
+
+      ]
+
+      function handleCreate(data: FormData) {
+        setPageTwo ({
+          level: data.level,
+          gender: data.gender,
+          objective: data.objective
+        })
+        
+        router.push("/nutrition")
+      }
+
+      
 
  return (
    <View style={styles.container}>
@@ -46,10 +78,38 @@ export default function Create() {
             <Select
                 control={control}
                 name='gender'
-                placeholder='Selecione o seu sexo'
+                placeholder='Qual seu sexo biológico?'
                 error={errors.gender?.message}
                 options={genderOptions}
             />
+
+            <Text style={styles.label}>Selecione o seu nivel de atividade física:</Text>
+            <Select
+                control={control}
+                name='level'
+                placeholder='Dentro das opções quão ativo você é?'
+                error={errors.level?.message}
+                options={levelOptions}
+            />
+
+            <Text style={styles.label}>Selecione o seu objetivo de dieta:</Text>
+            <Select
+                control={control}
+                name='objective'
+                placeholder='Qual seu objetivo?'
+                error={errors.objective?.message}
+                options={objectiveOptions}
+            />
+
+            <Pressable
+              onPress={handleSubmit(handleCreate)}
+              style={styles.button}>
+            
+              <Text style={styles.buttonText}>
+                Avançar
+              </Text>
+            
+            </Pressable>
         </ScrollView>
    </View>
   );
@@ -69,5 +129,17 @@ const styles = StyleSheet.create({
     content:{
         paddingLeft: 16,
         paddingRight: 16,
+    },
+    button:{
+      backgroundColor: colors.blue,
+      height: 44,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 4
+    },
+    buttonText:{
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: 'bold'
     }
 })
